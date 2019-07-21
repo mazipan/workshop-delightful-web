@@ -26,13 +26,18 @@ self.addEventListener('install', function(e) {
 });
 
 self.addEventListener('activate',  event => {
+  console.log('[ServiceWorker] Activate then claim');
   event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request, {ignoreSearch:true}).then(response => {
-      return response || fetch(event.request);
+    caches.match(event.request).then(response => {
+      if (response) {
+        console.log('[ServiceWorker] fetch from cache');
+        return response
+      }
+      return fetch(event.request);
     })
   );
 });
